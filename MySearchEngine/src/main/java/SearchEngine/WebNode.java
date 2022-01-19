@@ -4,21 +4,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class WebNode {
+public class WebNode implements Runnable{
 	private WebNode parent;
 	private ArrayList<WebNode> children;
+	private ArrayList<WebNode> pages;
 	private WebNode leftChildNode;
 	private WebNode rightChildNode;
 	private String URL;
 	private String title;
 	private double score;
 	public WebPage webPage;
-    //private Keyword keylist = new Keyword();
+    private ArrayList<Keyword> key;
 	
 
 	WebNode(WebPage webPage){
 		this.webPage = webPage;
 		this.children = new ArrayList<WebNode>();
+	}
+	WebNode(ArrayList<WebNode> pages,ArrayList<Keyword> key){
+		this.pages = pages;
+		this.key = key;
 	}
 	public void addChild(WebNode child){
 		//add the WebNode to its children list
@@ -33,11 +38,11 @@ public class WebNode {
 		score = webPage.getScore();
 		
 		
-		for(WebNode child : children){
+		/*for(WebNode child : children){
 			child.setNodeScore(keywords);
 			score += child.getScore();
 		}
-		
+		*/
 				
 			
 	}
@@ -105,5 +110,18 @@ public class WebNode {
 	}
 	public void setRightChildNode(WebNode rightChildNode) {
 		this.rightChildNode = rightChildNode;
+	}
+	@Override
+	public void run() {
+		try {
+			for(WebNode node:pages) {
+				node.setNodeScore(key);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }

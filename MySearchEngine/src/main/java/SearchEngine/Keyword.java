@@ -30,9 +30,11 @@ public class Keyword {
 		applelist.add(new Keyword("APPLE", 5));
 		applelist.add(new Keyword("MacBook", 5));
 		applelist.add(new Keyword("iMac", 5));
-		
-		
-		
+		applelist.add(new Keyword("Ä«ªG", 5));
+		applelist.add(new Keyword("Pro", 2));
+		applelist.add(new Keyword("iphone", 2));
+		applelist.add(new Keyword("ipad", 2));
+		applelist.add(new Keyword("ipod", 2));
 	}
 	
 	public void setName(String name) {
