@@ -38,12 +38,6 @@ public class WebTree {
 		thread2.join();
 		console.addAll(children1);
 		console.addAll(children2);
-		/*for(WebNode child : startNode.getChildren()){
-			
-			child.setNodeScore(keywords);
-			console.add(child);
-		}
-		startNode.setNodeScore(keywords);*/
 		}
 	
 	public void eularPrintTree(){
