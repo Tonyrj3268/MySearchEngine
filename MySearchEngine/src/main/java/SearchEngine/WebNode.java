@@ -41,19 +41,6 @@ public class WebNode implements Runnable{
 		this.children.add(child);
 		child.parent = this;
 	}
-	public  void setNodeScore(ArrayList<Keyword> keywords) throws IOException{
-				
-		webPage.setScore(keywords);
-		//**set webPage score to nodeScore
-		score = webPage.getScore();			
-		for(WebNode child : children){
-			child.setNodeScore(keywords);
-			score += child.getScore();
-		}
-		
-				
-			
-	}
 	
 	public boolean isTheLastChild(){
 		if(this.parent == null) return true;
@@ -70,8 +57,7 @@ public class WebNode implements Runnable{
 		}
 		return retVal;
 	}
-	
-	
+
 	
 	public String getTitle() {
 		return title;
@@ -119,22 +105,45 @@ public class WebNode implements Runnable{
 	public void setRightChildNode(WebNode rightChildNode) {
 		this.rightChildNode = rightChildNode;
 	}
+	
 	@Override
 	public void run() {
-		try {
+		
 			for(WebNode node:pages) {
+				Thread thread1 = new Thread(()->{
+					node.childQuery(node.webPage.getUrl());
+				});
 				
-				node.childQuery(node.webPage.getUrl());
-				node.setNodeScore(key);
-				
-			}
+				Thread thread2 = new Thread(()->{
+					try {
+						node.setNodeScore(key);
+					} catch (IOException | InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				thread1.start();
+				thread2.start();
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}	
+	}
+	public  void setNodeScore(ArrayList<Keyword> keywords) throws IOException, InterruptedException{
+		
+		webPage.setScore(keywords);
+		//**set webPage score to nodeScore
+		score = webPage.getScore();
+		if(children.size()==0) {
+			wait();
+		}
+		for(WebNode child : children){
+			child.setNodeScore(keywords);
+			score += child.getScore();
 		}
 		
+				
+			
 	}
+	
 	private String childFetchContent(String childUrl) {
 		String retVal = "";
 		//childUrl = new String(childUrl.getBytes("UTF-8"),"UTF-8");
@@ -196,6 +205,7 @@ public class WebNode implements Runnable{
 
 			}
 			if(i>=3) {
+				notify();
 				break;
 			}
 		}
