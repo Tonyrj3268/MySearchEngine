@@ -35,6 +35,7 @@ public class Keyword {
 		applelist.add(new Keyword("iphone", 2));
 		applelist.add(new Keyword("ipad", 2));
 		applelist.add(new Keyword("ipod", 2));
+		applelist.add(new Keyword("·s»D", -100));
 	}
 	
 	public void setName(String name) {

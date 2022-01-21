@@ -29,6 +29,7 @@ public class WebTree {
 		ArrayList<WebNode> children1 = new ArrayList<WebNode>(startNode.getChildren().subList(0,startNode.getChildren().size()/2));
 		ArrayList<WebNode> children2 = new ArrayList<WebNode>(startNode.getChildren().subList(startNode.getChildren().size()/2,startNode.getChildren().size()));
 	
+
 		Thread thread1 = new Thread(new WebNode(children1,keywords));
 		Thread thread2 = new Thread(new WebNode(children2,keywords));
 		thread1.start();	
@@ -53,7 +54,7 @@ public class WebTree {
 		quickSort(0, console.size()-1);
 		
 		for(WebNode node:console) {
-			System.out.println(node.webPage.getTitle()+"|"+node.webPage.getScore());
+			System.out.println(node.webPage.getTitle()+"|"+node.getScore());
 		}
 		
 		

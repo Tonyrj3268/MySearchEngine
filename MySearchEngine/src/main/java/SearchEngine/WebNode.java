@@ -1,7 +1,17 @@
 package SearchEngine;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 
 public class WebNode implements Runnable{
@@ -24,25 +34,23 @@ public class WebNode implements Runnable{
 	WebNode(ArrayList<WebNode> pages,ArrayList<Keyword> key){
 		this.pages = pages;
 		this.key = key;
+		this.children = new ArrayList<WebNode>();
 	}
 	public void addChild(WebNode child){
 		//add the WebNode to its children list
 		this.children.add(child);
 		child.parent = this;
 	}
-	public void setNodeScore(ArrayList<Keyword> keywords) throws IOException{
-		
-		
+	public  void setNodeScore(ArrayList<Keyword> keywords) throws IOException{
+				
 		webPage.setScore(keywords);
 		//**set webPage score to nodeScore
-		score = webPage.getScore();
-		
-		
-		/*for(WebNode child : children){
+		score = webPage.getScore();			
+		for(WebNode child : children){
 			child.setNodeScore(keywords);
 			score += child.getScore();
 		}
-		*/
+		
 				
 			
 	}
@@ -115,7 +123,10 @@ public class WebNode implements Runnable{
 	public void run() {
 		try {
 			for(WebNode node:pages) {
+				
+				node.childQuery(node.webPage.getUrl());
 				node.setNodeScore(key);
+				
 			}
 			
 		} catch (IOException e) {
@@ -123,5 +134,71 @@ public class WebNode implements Runnable{
 			e.printStackTrace();
 		}
 		
+	}
+	private String childFetchContent(String childUrl) {
+		String retVal = "";
+		//childUrl = new String(childUrl.getBytes("UTF-8"),"UTF-8");
+		URL u;
+		try {
+			u = new URL(childUrl);
+			URLConnection conn = u.openConnection();
+
+			conn.setRequestProperty("User-agent", "Chrome/7.0.517.44");
+			conn.setConnectTimeout(3000);
+			conn.setReadTimeout(3000);			
+			InputStream in = conn.getInputStream();
+			
+			InputStreamReader inReader = new InputStreamReader(in,"utf-8");
+			
+			BufferedReader bufReader = new BufferedReader(inReader);
+			String line = null;
+
+			while((line=bufReader.readLine())!=null)
+			{
+				retVal+=line;
+
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+		
+		
+		return retVal;
+	}
+	
+	public void childQuery(String childUrl) {
+		String childContent = null;
+		int i=0;
+		if(childContent==null){
+			
+			childContent= childFetchContent(childUrl);
+
+		}		
+		Document doc = Jsoup.parse(childContent,childUrl);
+		
+		Elements lis = doc.select("div");
+		//lis = lis.select(".kCrYT");
+		String beforeUrl="";
+		for(Element li : lis){
+			
+			try {
+				
+				String citeUrl = li.select("a").get(0).attr("abs:href");
+				if(beforeUrl.equals(citeUrl)) {
+					continue;
+				}
+				beforeUrl = citeUrl;
+				WebPage page = new WebPage(citeUrl);				
+				addChild(new WebNode(page));
+				i++;
+			} catch (IndexOutOfBoundsException e) {
+
+			}
+			if(i>=3) {
+				break;
+			}
+		}
+
 	}
 }

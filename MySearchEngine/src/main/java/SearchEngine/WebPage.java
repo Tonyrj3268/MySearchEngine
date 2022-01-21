@@ -36,7 +36,6 @@ public class WebPage {
 		for(Keyword k : keywords){	
 			
 			score+=counter.countKeyword(k.name)*k.getScore();
-			System.out.println(title+"|"+k.name+"|"+score);
 		}
 	}
 
